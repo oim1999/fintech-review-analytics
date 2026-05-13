@@ -2,7 +2,8 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, task-1, task-2]
+    branches: [main, task-1, task-2, task-3, task-4]
+
 
   pull_request:
     branches: [main]
@@ -27,4 +28,4 @@ jobs:
 
       - name: Verify imports
         run: |
-          python -c "import pandas, numpy, matplotlib, sklearn, ta"
+          python -c "import pandas, numpy, matplotlib, seaborn, scipy, streamlit; print('All imports successful')"
