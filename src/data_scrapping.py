@@ -1,6 +1,7 @@
+# data_scrapping.py — FIXED VERSION
 import pandas as pd
 import re
-from google_play_scraper import app, reviews, Sort
+from google_play_scraper import reviews, Sort
 
 APPS = {
     'CBE Mobile':  'com.combanketh.mobilebanking',
@@ -10,7 +11,7 @@ APPS = {
 
 
 def scrape_fintech_reviews(app_dict, count=500, return_raw=False):
-    """Fetches 500 reviews for CBE, BoA and Dashen Mobile apps."""
+    """Fetches reviews for Ethiopian fintech apps from Google Play."""
     all_reviews = []
     for name, pkg in app_dict.items():
         try:
@@ -23,14 +24,15 @@ def scrape_fintech_reviews(app_dict, count=500, return_raw=False):
             )
             if return_raw:
                 return responses
+            
             for response in responses:
                 all_reviews.append({
-                    'review_id': response['reviewId'],
+                    'review_id': response.get('reviewId', ''),  # .get() for safety
                     'app': name,
-                    'review': response['content'],
-                    'rating': response['score'],
-                    'date': response['at'],
-                    'thumbs': response['thumbsUpCount'],
+                    'review': response.get('content', ''),
+                    'rating': response.get('score', None),
+                    'date': response.get('at', None),
+                    'thumbs': response.get('thumbsUpCount', 0),
                     'bank': name,
                     'source': 'Google Play'
                 })
@@ -39,11 +41,12 @@ def scrape_fintech_reviews(app_dict, count=500, return_raw=False):
             print(f"  Failed to scrape {name}: {e}")
     return pd.DataFrame(all_reviews)
 
+
 def clean_text(text):
     """Standardize review text: collapse whitespace, strip edges."""
     if pd.isna(text):
         return ''
     text = str(text)
-    text = re.sub(r'\s+', ' ', text)  # collapse multiple spaces/newlines
+    text = re.sub(r'[^a-zA-Z\s]', ' ', str(text).lower())  # convert to lowercase and remove special characters
     text = text.strip()               # remove leading/trailing whitespace
     return text

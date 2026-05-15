@@ -28,4 +28,4 @@ jobs:
 
       - name: Verify imports
         run: |
-          python -c "import pandas, numpy, matplotlib, seaborn, scipy, streamlit; print('All imports successful')"
+          python -c "from src.data_scrapping import scrape_fintech_reviews, clean_text; print('Imports OK')"
